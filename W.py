@@ -7,6 +7,35 @@ import sqlite3
 
 import pygame
 
+# Инициализация заставки
+pygame.init()
+
+# Размеры окна
+screen_width = 1280
+screen_height = 700
+
+# Создание окна
+screen = pygame.display.set_mode((screen_width, screen_height))
+pygame.display.set_caption("заставка")
+
+# Загрузка изображения
+background_image2 = pygame.image.load('i (1).webp')
+
+# Основной цикл
+running = True
+while running:
+    # Обработка событий
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
+        elif event.type == pygame.KEYDOWN:
+            # Переход к следующему экрану при нажатии любой клавиши
+            running = False
+    # Отображение фона
+    screen.blit(background_image2, (0, 0))
+    # Обновление экрана
+    pygame.display.flip()
+
 # Инициализация основной игры
 pygame.init()
 
@@ -52,7 +81,13 @@ class Dinosaur:
 
     # Отрисовка персонажа
     def draw(self, screen):
-        screen.blit(self.image1, (self.x, self.y))  # Отображение изображения
+        # Отображение изображений
+        screen.blit(self.image1, (self.x, self.y))
+
+        # начинаю рисовать задний фон
+        pygame.draw.ellipse(screen, 'GRAY', (640, 10, 150, 150))
+
+        pygame.draw.rect(screen, 'GRAY', (0, 397, 800, 15))
 
 
 # Класс Препятствия
@@ -97,13 +132,18 @@ class End:
 
 # Основная функция игры
 def main():
+    # рисую перый холст с длиной и шириной введынми раньше
     screen = pygame.display.set_mode((WIDTH, HEIGHT))
+    # меняю название
     pygame.display.set_caption("завр")
     clock = pygame.time.Clock()
+
+    # Подключаю базу данных для изменнения рекордов
 
     conn = sqlite3.connect("Dino_score.sqlite")
     cursor = conn.cursor()
 
+    # Ввожу переменные для использания их в дальнейшем
     dinosaur = Dinosaur()
     obstacles = []
     obstacles_pter = []
@@ -159,9 +199,11 @@ def main():
             if (dinosaur.x < obstacle.x + obstacle.width - 5 and
                     dinosaur.x + dinosaur.width > obstacle.x and
                     dinosaur.y + dinosaur.height > HEIGHT - obstacle.height - 30):
-                print(f"Game Over!, {score}")
+                print(f"Game Over!")
                 sq = f'UPDATE Scores set Score = {str(score)}'
+                # cursor.update()
                 cursor.execute(sq)
+
                 running = False
 
         # Отрисовка динозавра
@@ -179,3 +221,33 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+# Иницилизация завершения игры
+pygame.init()
+
+# Размеры окна
+screen_width = 1280
+screen_height = 700
+
+# Создание окна
+screen = pygame.display.set_mode((screen_width, screen_height))
+pygame.display.set_caption("Концовка")
+
+# Загрузка изображения
+background_image2 = pygame.image.load('i (2).webp')
+
+# Основной цикл
+running = True
+while running:
+    # Обработка событий
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
+        # При нажатии кнопки мыши игра закрывается
+        elif event.type == pygame.MOUSEBUTTONDOWN:
+            running = False
+    # Отображение фона
+    screen.blit(background_image2, (0, 0))
+    # Обновление экрана
+    pygame.display.flip()
+pygame.quit()
