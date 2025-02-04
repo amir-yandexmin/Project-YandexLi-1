@@ -40,6 +40,8 @@ while running:
 pygame.init()
 
 # кОнСтАнТы
+conn = sqlite3.connect("Dino_score.sqlite")
+cursor = conn.cursor()
 WIDTH, HEIGHT = 800, 400
 FPS = 60
 GRAVITY = 0.5
@@ -140,9 +142,6 @@ def main():
 
     # Подключаю базу данных для изменнения рекордов
 
-    conn = sqlite3.connect("Dino_score.sqlite")
-    cursor = conn.cursor()
-
     # Ввожу переменные для использания их в дальнейшем
     dinosaur = Dinosaur()
     obstacles = []
@@ -200,10 +199,15 @@ def main():
                     dinosaur.x + dinosaur.width > obstacle.x and
                     dinosaur.y + dinosaur.height > HEIGHT - obstacle.height - 30):
                 print(f"Game Over!")
-                sq = f'UPDATE Scores set Score = {str(score)}'
-                # cursor.update()
-                cursor.execute(sq)
 
+                sq = f'SELECT score from Scoress'
+                cursor.execute(sq)
+                sss = cursor.fetchall()[0][0]
+                if int(sss) < score:
+                    sqq = f'UPDATE Scoress set score = {score}'
+                    cursor.execute(sqq)
+                conn.commit()
+                conn.close()
                 running = False
 
         # Отрисовка динозавра
@@ -211,12 +215,13 @@ def main():
 
         # Отображение счета
         CHET_IGROKA = pygame.font.Font(None, 40)
-        text = CHET_IGROKA.render(f'Счёт: {score}', True, BLACK, 'GRAY')
+        text = CHET_IGROKA.render(f"Счёт: {score}", True, BLACK, 'GRAY')
         screen.blit(text, (10, 10))
 
         pygame.display.flip()
 
     pygame.quit()
+    return score
 
 
 if __name__ == "__main__":
@@ -248,6 +253,9 @@ while running:
             running = False
     # Отображение фона
     screen.blit(background_image2, (0, 0))
+
+    sq = f'SELECT score from Scoress'
+    cursor.execute(sq)
     # Обновление экрана
     pygame.display.flip()
 pygame.quit()
